@@ -1,12 +1,43 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ✅ Requirements
 
-Currently, two official plugins are available:
+- [Node.js](https://nodejs.org/) (v16 or later)
+- npm or yarn
+- Backend API running (refer: [`product-api`](https://github.com/your-username/product-api))
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🏁 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/react-product-catalog.git
+cd dirname
+
+## Install Dependencies
+npm install
+
+## 🔁 Proxy Setup for API (Vite)
+
+If you're running the frontend and backend on different ports (e.g., React on 5173 and Node.js API on 3000), configure Vite to **proxy API requests** to the backend.
+
+### 🔧 Edit `vite.config.js`
+
+Update your Vite config like this:
+
+```js
+// vite.config.js
+export default {
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // 🔁 Your backend API URL
+      },
+    },
+  },
+};
+
+
+##startfile
+npm run dev
