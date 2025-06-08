@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import useFetch from '../hooks/useFetch'
+import useFetch from "../hooks/useFetch";
+import { useState, useEffect } from "react";
 
-function AddProduct({ setShowAddProductModal, setDatas }) {
-
+function EditProduct({ setShowEditProductModal, id, setDatas }) {
     //fetching subcategorires
     const { datas: Subcategories } = useFetch("subCategory/all");
+    const { datas } = useFetch(`/product/${id}`);
 
     const [product, setProduct] = useState({
         title: '',
@@ -13,7 +13,21 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
         variants: [{ ram: '', price: '', quantity: 1 }],
         images: []
     });
+
     const [error, setError] = useState(null);
+
+    //adding initial value to product
+    useEffect(() => {
+        if (datas) {
+            setProduct({
+                title: datas.title || '',
+                subCategoryId: datas.subCategoryId || '',
+                description: datas.description || '',
+                variants: datas.variants || [{ ram: '', price: '', quantity: 1 }],
+                images: datas.images || []
+            });
+        }
+    }, [datas]);
 
     //managing variant changes
     const handleVariantChange = (index, field, value) => {
@@ -45,6 +59,13 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
     };
 
 
+    const imageUrl = (img) => {
+        return img instanceof File
+            ? URL.createObjectURL(img)
+            : `http://localhost:3000/uploads/${img}`;
+    }
+
+
     //adding products
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -60,7 +81,7 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
         formData.append("title", product.title);
         formData.append("description", product.description);
         formData.append("subCategoryId", product.subCategoryId);
-        formData.append("variants", JSON.stringify(product.variants));
+        formData.append("variants", JSON.stringify(validVariants));
 
         if (product.images && product.images.length > 0) {
             product.images.forEach((img) => {
@@ -70,8 +91,8 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
 
         try {
 
-            const res = await fetch('/api/product/add', {
-                method: 'POST',
+            const res = await fetch(`/api/product/edit/${id}`, {
+                method: 'PUT',
                 body: formData,
             });
             const data = await res.json();
@@ -81,24 +102,20 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
                 return
             }
 
-            setDatas(prev => {
-                return [...prev,data?.response]
-            })
-
-            setShowAddProductModal(false);
+            setDatas(data?.response);
+            setShowEditProductModal(false);
 
         } catch (error) {
             setError(error.message);
         }
 
     }
-
     return (
         <>
             <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
             <div className="fixed max-w-2xl w-full top-1/2 left-1/2 z-50 bg-white rounded-lg shadow-lg p-6 transform -translate-x-1/2 -translate-y-1/2">
                 <form className="flex flex-col" onSubmit={handleSubmit}>
-                    <h1 className='text-center mb-2'>Add Product</h1>
+                    <h1 className='text-center mb-2'>Edit Product</h1>
 
                     <div className="mb-4 flex gap-2 items-center">
                         <label className=" mb-1 text-gray-600 w-32">Title:</label>
@@ -196,10 +213,10 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
                         <label className="block mb-1 text-gray-600">Upload image:</label>
                         <div>
                             <div className="flex gap-2">
-                                {product.images.map((img, index) => (
+                                {product.images.length > 0 && product.images.map((img, index) => (
                                     <img
                                         key={index}
-                                        src={URL.createObjectURL(img)}
+                                        src={imageUrl(img)}
                                         alt={`preview-${index}`}
                                         className="w-16 h-16 object-cover border rounded-md"
                                     />
@@ -217,10 +234,10 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
                     {error && <p className='my-2 text-red-300'>{error}</p>}
                     <div className='flex justify-center gap-2'>
                         <button type="submit" className="bg-button px-3 text-white py-2 rounded-md">
-                            ADD
+                            EDIT
                         </button>
                         <button className="bg-discardButton px-3 py-2 rounded-md"
-                            onClick={() => { setShowAddProductModal(false) }}>
+                            onClick={() => { setShowEditProductModal(false) }}>
                             DISCARD
                         </button>
                     </div>
@@ -230,4 +247,4 @@ function AddProduct({ setShowAddProductModal, setDatas }) {
     )
 }
 
-export default AddProduct
+export default EditProduct
