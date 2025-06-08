@@ -2,7 +2,7 @@ import { useState } from "react";
 import useFetch from "../hooks/useFetch"
 
 
-function AddSubCategory({ setShowAddSubCategoryModal }) {
+function AddSubCategory({ setShowAddSubCategoryModal,setIsCategoryAdded }) {
 
   const { datas: categories } = useFetch("category/all");
 
@@ -30,7 +30,7 @@ function AddSubCategory({ setShowAddSubCategoryModal }) {
         setError(data?.message);
         return;
       }
-      console.log(data);
+      setIsCategoryAdded(Date.now());
       setShowAddSubCategoryModal(false);
     } catch (error) {
       setError(error.message)

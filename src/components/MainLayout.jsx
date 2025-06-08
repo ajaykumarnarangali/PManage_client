@@ -16,21 +16,26 @@ function MainLayout() {
     const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
     const [showAddSubCategoryModal, setShowAddSubCategoryModal] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
+
+    //for re-rendering when new category is adding 
+    const [isCategoryAdded, setIsCategoryAdded] = useState(null);
+
     const LIMIT = 1;
     const [currentPage, setCurrentPage] = useState(1);
     const [url, setUrl] = useState(`product/get?limit=${LIMIT}&page=${currentPage}`)
 
     const [searchParams] = useSearchParams();
     let search = searchParams.get('search') || '';
+    let subcat = searchParams.get('subcat') || '';
     const location = useLocation();
 
     useEffect(() => {
-        if (search.trim().length > 0) {
+        if (search.trim()) {
             setUrl(`product/get?search=${encodeURIComponent(search)}`);
-        } else {
-            setUrl(`product/get?limit=${LIMIT}&page=${currentPage}`);
+        } else if (subcat) {
+            setUrl(`product/get?subcat=${encodeURIComponent(subcat)}`);
         }
-    }, [location]);
+    }, [search, subcat]);
 
     const { datas, total, setDatas } = useFetch(url);
 
@@ -61,12 +66,12 @@ function MainLayout() {
                 </div>
             </div>
 
-            {showAddCategoryModal && <AddCategory setShowAddCategoryModal={setShowAddCategoryModal} />}
-            {showAddSubCategoryModal && <AddSubCategory setShowAddSubCategoryModal={setShowAddSubCategoryModal} />}
+            {showAddCategoryModal && <AddCategory setShowAddCategoryModal={setShowAddCategoryModal} setIsCategoryAdded={setIsCategoryAdded} />}
+            {showAddSubCategoryModal && <AddSubCategory setShowAddSubCategoryModal={setShowAddSubCategoryModal} setIsCategoryAdded={setIsCategoryAdded} />}
             {showAddProductModal && <AddProduct setShowAddProductModal={setShowAddProductModal} setDatas={setDatas} />}
 
             <div className='h-full flex'>
-                <Sidebar />
+                <Sidebar isCategoryAdded={isCategoryAdded} />
                 <div className='w-full flex flex-col'>
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 overflow-y-scroll p-4 gap-6">
                         {datas?.length > 0 ? (
@@ -79,7 +84,9 @@ function MainLayout() {
                             </div>
                         )}
                     </div>
-                    <Pagination LIMIT={LIMIT} TOTAL_PAGES={TOTAL_PAGES} currentPage={currentPage} setUrl={setUrl} setCurrentPage={setCurrentPage} />
+                    {location.pathname === "/home" && location.search === "" &&
+                        <Pagination LIMIT={LIMIT} TOTAL_PAGES={TOTAL_PAGES} currentPage={currentPage} setUrl={setUrl} setCurrentPage={setCurrentPage} />
+                    }
                 </div>
             </div>
         </div>

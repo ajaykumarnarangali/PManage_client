@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useUser } from '../context/UserContext'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import WishList from './WishList';
 
 function Header() {
@@ -10,11 +10,17 @@ function Header() {
 
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.search == '') {
+            setSearch('');
+        }
+    }, [location])
 
     const handleSearch = (e) => {
         e.preventDefault();
         navigate(`/home?search=${search}`);
-        setSearch('');
     }
 
     const handleSignout = () => {

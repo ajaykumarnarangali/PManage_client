@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function AddCategory({ setShowAddCategoryModal }) {
+function AddCategory({ setShowAddCategoryModal,setIsCategoryAdded }) {
 
     const [category, setCategory] = useState("");
     const [error, setError] = useState(null)
@@ -25,7 +25,7 @@ function AddCategory({ setShowAddCategoryModal }) {
                 setError(data?.message);
                 return;
             }
-            console.log(data);
+            setIsCategoryAdded(Date.now());
             setShowAddCategoryModal(false);
         } catch (error) {
             setError(error.message)

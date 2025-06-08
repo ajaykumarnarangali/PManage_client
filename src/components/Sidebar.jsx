@@ -1,23 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useFetch from '../hooks/useFetch'
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
-function Sidebar() {
+function Sidebar({ isCategoryAdded }) {
 
-  const { datas,setDatas } = useFetch("/category/Allcategories");
+  const { datas, refetch } = useFetch("/category/Allcategories");
+  const navigate = useNavigate();
 
   const [expanded, setExpanded] = useState({});
   const [selected, setSelected] = useState({});
+
+  useEffect(() => {
+    refetch();
+  }, [isCategoryAdded]);
+
 
   const toggleExpand = (catId) => {
     setExpanded((prev) => ({ ...prev, [catId]: !prev[catId] }));
   };
 
   const toggleSelect = (subId) => {
-    setSelected((prev) => ({
-      ...prev,
-      [subId]: !prev[subId],
-    }));
+    setSelected((prev) => {
+      const newState = { ...prev, [subId]: !prev[subId] };
+      doNavigate(newState);
+      return newState
+    });
+  };
+
+  const doNavigate = (selectedState) => {
+    const selectedSubcats = Object.entries(selectedState)
+      .filter(([key, value]) => value)
+      .map(([key]) => key)
+      .join(',');
+
+    navigate(`/home?subcat=${selectedSubcats}`);
   };
 
   return (

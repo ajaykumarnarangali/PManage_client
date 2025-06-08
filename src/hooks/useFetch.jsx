@@ -29,8 +29,10 @@ const useFetch = (url) => {
         fetchData();
     }, [url])
 
+    const refetch = () => fetchData();
+
     return {
-        datas, setDatas, total
+        datas, setDatas, total, refetch
     };
 };
 
